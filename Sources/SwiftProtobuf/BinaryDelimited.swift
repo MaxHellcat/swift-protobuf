@@ -54,6 +54,9 @@ public enum BinaryDelimited {
     // TODO: Revisit to avoid the extra buffering when encoding is streamed in general.
     let serialized = try message.serializedData(partial: partial)
     let totalSize = Varint.encodedSize(of: UInt64(serialized.count)) + serialized.count
+
+    print("Protobuf: serialize.len \(totalSize)")
+
     var data = Data(count: totalSize)
     data.withUnsafeMutableBytes { (body: UnsafeMutableRawBufferPointer) in
       if let baseAddress = body.baseAddress, body.count > 0 {
@@ -67,12 +70,19 @@ public enum BinaryDelimited {
     data.withUnsafeBytes { (body: UnsafeRawBufferPointer) in
       if let baseAddress = body.baseAddress, body.count > 0 {
         let pointer = baseAddress.assumingMemoryBound(to: UInt8.self)
+
+        if stream.streamStatus == .error || stream.streamError != nil {
+
+            written = -1
+            return
+        }
+
         written = stream.write(pointer, maxLength: totalSize)
       }
     }
 
     if written != totalSize {
-      if written == -1 {
+      if written < 0 {
         if let streamError = stream.streamError {
           throw streamError
         }
@@ -153,22 +163,43 @@ public enum BinaryDelimited {
     options: BinaryDecodingOptions = BinaryDecodingOptions()
   ) throws {
     let length = try Int(decodeVarint(stream))
+
+    print("Protobuf: parse.len \(length)")
+
     if length == 0 {
       // The message was all defaults, nothing to actually read.
       return
     }
 
-    var data = Data(count: length)
     var bytesRead: Int = 0
-    data.withUnsafeMutableBytes { (body: UnsafeMutableRawBufferPointer) in
-      if let baseAddress = body.baseAddress, body.count > 0 {
-        let pointer = baseAddress.assumingMemoryBound(to: UInt8.self)
-        bytesRead = stream.read(pointer, maxLength: length)
-      }
+    let pointer = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
+
+    var pointerOffset = pointer
+
+    while bytesRead < length {
+
+        if stream.streamStatus == .error || stream.streamError != nil {
+
+            bytesRead = -1
+            break
+        }
+
+        let bytesNow = stream.read(pointerOffset, maxLength: length - bytesRead)
+
+        if bytesNow < 0 {
+            if let streamError = stream.streamError {
+                throw streamError
+            }
+            throw BinaryDelimited.Error.unknownStreamError
+        }
+
+        bytesRead += bytesNow
+
+        pointerOffset = pointer.advanced(by: bytesRead)
     }
 
     if bytesRead != length {
-      if bytesRead == -1 {
+      if bytesRead < 0 {
         if let streamError = stream.streamError {
           throw streamError
         }
@@ -176,6 +207,9 @@ public enum BinaryDelimited {
       }
       throw BinaryDelimited.Error.truncated
     }
+
+    let data = Data(buffer: UnsafeBufferPointer<UInt8>(start: pointer, count: bytesRead))
+    pointer.deallocate()
 
     try message.merge(serializedData: data,
                       extensions: extensions,
