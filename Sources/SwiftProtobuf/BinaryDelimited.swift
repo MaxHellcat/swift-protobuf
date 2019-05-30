@@ -232,7 +232,14 @@ internal func decodeVarint(_ stream: InputStream) throws -> UInt64 {
   #endif
 
   func nextByte() throws -> UInt8 {
+
+    if stream.streamStatus == .error || stream.streamError != nil {
+
+        throw BinaryDelimited.Error.unknownStreamError
+    }
+
     let bytesRead = stream.read(readBuffer, maxLength: 1)
+
     if bytesRead != 1 {
       if bytesRead == -1 {
         if let streamError = stream.streamError {
