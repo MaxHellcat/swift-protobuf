@@ -55,8 +55,6 @@ public enum BinaryDelimited {
     let serialized = try message.serializedData(partial: partial)
     let totalSize = Varint.encodedSize(of: UInt64(serialized.count)) + serialized.count
 
-    print("Protobuf: serialize.len \(totalSize)")
-
     var data = Data(count: totalSize)
     data.withUnsafeMutableBytes { (body: UnsafeMutableRawBufferPointer) in
       if let baseAddress = body.baseAddress, body.count > 0 {
@@ -163,8 +161,6 @@ public enum BinaryDelimited {
     options: BinaryDecodingOptions = BinaryDecodingOptions()
   ) throws {
     let length = try Int(decodeVarint(stream))
-
-    print("Protobuf: parse.len \(length)")
 
     if length == 0 {
       // The message was all defaults, nothing to actually read.
