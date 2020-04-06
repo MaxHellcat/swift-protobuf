@@ -556,7 +556,8 @@ extension Test_JSON {
         ("testRepeatedInt32", testRepeatedInt32),
         ("testRepeatedString", testRepeatedString),
         ("testRepeatedNestedMessage", testRepeatedNestedMessage),
-        ("testOneof", testOneof)
+        ("testOneof", testOneof),
+        ("testEmptyMessage", testEmptyMessage)
     ]
 }
 
@@ -736,6 +737,12 @@ extension Test_MessageSet {
     ]
 }
 
+extension Test_PackageMapping {
+    static var allTests = [
+        ("testPackageStartingWithNumber", testPackageStartingWithNumber)
+    ]
+}
+
 extension Test_FieldNamingInitials {
     static var allTests = [
         ("testHidingFunctions", testHidingFunctions),
@@ -766,6 +773,14 @@ extension Test_ExtensionNamingInitials_GlobalScoped_NoPrefix {
         ("testLowers", testLowers),
         ("testUppers", testUppers),
         ("testWordCase", testWordCase)
+    ]
+}
+
+extension Test_ValidIdentifiers {
+    static var allTests = [
+        ("testFieldNames", testFieldNames),
+        ("testOneofNames", testOneofNames),
+        ("testEnumCaseNames", testEnumCaseNames)
     ]
 }
 
@@ -952,8 +967,10 @@ extension Test_TextFormat_Unknown {
         ("test_unknown_lengthDelimited_message", test_unknown_lengthDelimited_message),
         ("test_unknown_lengthDelimited_notmessage", test_unknown_lengthDelimited_notmessage),
         ("test_unknown_lengthDelimited_nested_message", test_unknown_lengthDelimited_nested_message),
+        ("test_unknown_lengthDelimited_nested_message_recursion_limits", test_unknown_lengthDelimited_nested_message_recursion_limits),
         ("test_unknown_group", test_unknown_group),
         ("test_unknown_nested_group", test_unknown_nested_group),
+        ("test_unknown_nested_group_no_recursion_limits", test_unknown_nested_group_no_recursion_limits),
         ("test_unknown_fixed32", test_unknown_fixed32)
     ]
 }
@@ -1151,10 +1168,12 @@ XCTMain(
         testCase(Test_Map_JSON.allTests),
         testCase(Test_Merge.allTests),
         testCase(Test_MessageSet.allTests),
+        testCase(Test_PackageMapping.allTests),
         testCase(Test_FieldNamingInitials.allTests),
         testCase(Test_ExtensionNamingInitials_MessageScoped.allTests),
         testCase(Test_ExtensionNamingInitials_GlobalScoped.allTests),
         testCase(Test_ExtensionNamingInitials_GlobalScoped_NoPrefix.allTests),
+        testCase(Test_ValidIdentifiers.allTests),
         testCase(Test_OneofFields_Access_Proto2.allTests),
         testCase(Test_OneofFields_Access_Proto3.allTests),
         testCase(Test_Packed.allTests),
