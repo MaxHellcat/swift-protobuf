@@ -150,7 +150,7 @@ class OneofGenerator {
         // from each extension range as an easy way to check for them being
         // mixed in between the fields.
         var parentNumbers = descriptor.containingType.fields.map { Int($0.number) }
-        parentNumbers.append(contentsOf: descriptor.containingType.extensionRanges.map { Int($0.start) })
+        parentNumbers.append(contentsOf: descriptor.containingType.normalizedExtensionRanges.map { Int($0.start) })
         var parentNumbersIterator = parentNumbers.sorted(by: { $0 < $1 }).makeIterator()
         var nextParentFieldNumber = parentNumbersIterator.next()
         var grouped = [[MemberFieldGenerator]]()
@@ -318,7 +318,10 @@ class OneofGenerator {
         }
 
         let getter = usesHeapStorage ? "_storage.\(underscoreSwiftFieldName)" : swiftFieldName
-        let setter = usesHeapStorage ? "_uniqueStorage().\(underscoreSwiftFieldName)" : swiftFieldName
+        // Within `set` below, if the oneof name was "newValue" then it has to
+        // be qualified with `self.` to avoid the collision with the setter
+        // parameter.
+        let setter = usesHeapStorage ? "_uniqueStorage().\(underscoreSwiftFieldName)" : (swiftFieldName == "newValue" ? "self.newValue" : swiftFieldName)
 
         let visibility = generatorOptions.visibilitySourceSnippet
 

@@ -15,7 +15,8 @@ extension Test_Descriptor {
         ("testLookup", testLookup),
         ("testParents", testParents),
         ("testFields", testFields),
-        ("testExtensions", testExtensions)
+        ("testExtensions", testExtensions),
+        ("testExtensionRanges", testExtensionRanges)
     ]
 }
 
@@ -423,8 +424,11 @@ extension Test_Conformance {
         ("testInt32_min_roundtrip", testInt32_min_roundtrip),
         ("testInt32_toosmall", testInt32_toosmall),
         ("testRepeatedBoolWrapper", testRepeatedBoolWrapper),
-        ("testString_badUnicodeEscape", testString_badUnicodeEscape),
+        ("testString_unicodeEscape", testString_unicodeEscape),
         ("testString_surrogates", testString_surrogates),
+        ("testBytes_unicodeEscape", testBytes_unicodeEscape),
+        ("testBytes_surrogates", testBytes_surrogates),
+        ("test_LiteralIncludeLF", test_LiteralIncludeLF),
         ("testMaps_TextFormatKeysSorted", testMaps_TextFormatKeysSorted)
     ]
 }
