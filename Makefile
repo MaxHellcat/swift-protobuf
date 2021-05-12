@@ -112,6 +112,7 @@ TEST_PROTOS= \
 	Protos/google/protobuf/unittest_proto3_arena.proto \
 	Protos/google/protobuf/unittest_proto3_optional.proto \
 	Protos/google/protobuf/unittest_well_known_types.proto \
+	Protos/fuzz_testing.proto \
 	Protos/unittest_swift_all_required_types.proto \
 	Protos/unittest_swift_cycle.proto \
 	Protos/unittest_swift_enum.proto \
@@ -208,6 +209,7 @@ endif
 	reference \
 	regenerate \
 	regenerate-conformance-protos \
+	regenerate-fuzz-protos \
 	regenerate-library-protos \
 	regenerate-plugin-protos \
 	regenerate-test-protos \
@@ -336,7 +338,7 @@ test-plugin: build ${PROTOC_GEN_SWIFT}
 # against our menagerie of sample protos.
 #
 # If you do this, you MUST MANUALLY verify these files before checking them in,
-# since the new checkin will become the new master reference.
+# since the new checkin will become the new main reference.
 #
 # Note: Some of these protos define the same package.(message|enum)s, so they
 # can't be done in a single protoc/proto-gen-swift invoke and have to be done
@@ -358,6 +360,7 @@ reference: build ${PROTOC_GEN_SWIFT}
 #
 regenerate: \
 	regenerate-library-protos \
+	regenerate-fuzz-protos \
 	regenerate-plugin-protos \
 	regenerate-test-protos \
 	regenerate-conformance-protos \
@@ -391,6 +394,15 @@ regenerate-test-protos: build ${PROTOC_GEN_SWIFT} Protos/generated_swift_names_e
 		--tfiws_opt=FileNaming=DropPath \
 		--tfiws_out=Tests/SwiftProtobufTests \
 		${TEST_PROTOS}
+
+# Rebuild just the protos used by the plugin
+regenerate-fuzz-protos: build ${PROTOC_GEN_SWIFT}
+	find FuzzTesting/Sources/FuzzCommon -name "*.pb.swift" -exec rm -f {} \;
+	${GENERATE_SRCS} \
+		--tfiws_opt=FileNaming=DropPath \
+		--tfiws_opt=Visibility=Public \
+		--tfiws_out=FuzzTesting/Sources/FuzzCommon \
+		Protos/fuzz_testing.proto
 
 Tests/SwiftProtobufPluginLibraryTests/DescriptorTestData.swift: build ${PROTOC_GEN_SWIFT} ${SWIFT_DESCRIPTOR_TEST_PROTOS}
 	# Until the flag isn't needed, add the flag to enable proto3 optional.

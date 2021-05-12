@@ -4,7 +4,7 @@
 // Licensed under Apache License v2.0 with Runtime Library Exception
 //
 // See LICENSE.txt for license information:
-// https://github.com/apple/swift-protobuf/blob/master/LICENSE.txt
+// https://github.com/apple/swift-protobuf/blob/main/LICENSE.txt
 //
 // -----------------------------------------------------------------------------
 ///
@@ -108,8 +108,7 @@ struct GeneratorPlugin {
         + "Package.swift:\n"
         + "\n"
         + "   dependencies: [\n"
-        + "     .Package(url: \"https://github.com/apple/swift-protobuf\",\n"
-        + "              Version(\(packageVersion)))\n"
+        + "     .package(name: \"SwiftProtobuf\", url: \"https://github.com/apple/swift-protobuf.git\", from: \"\(packageVersion)\"),"
         + "   ]\n"
         + "\n"
         + "\n"
